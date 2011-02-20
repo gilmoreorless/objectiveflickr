@@ -62,6 +62,7 @@ extern NSString *const OFFlickrDeletePermission;
 
 // URL provisioning
 - (NSURL *)photoSourceURLFromDictionary:(NSDictionary *)inDictionary size:(NSString *)inSizeModifier;
+- (NSURL *)photoLargestSourceURLFromDictionary:(NSDictionary *)inDictionary;
 - (NSURL *)photoWebPageURLFromDictionary:(NSDictionary *)inDictionary;
 - (NSURL *)loginURLFromFrobDictionary:(NSDictionary *)inFrob requestedPermission:(NSString *)inPermission;
 

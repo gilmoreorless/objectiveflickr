@@ -126,13 +126,15 @@ typedef unsigned int NSUInteger;
 
 - (NSURL *)photoSourceURLFromDictionary:(NSDictionary *)inDictionary size:(NSString *)inSizeModifier
 {
-	// http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}_[mstb].jpg
+	// http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}_[mstbo].jpg
 	// http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
 	
 	NSString *farm = [inDictionary objectForKey:@"farm"];
 	NSString *photoID = [inDictionary objectForKey:@"id"];
 	NSString *secret = [inDictionary objectForKey:@"secret"];
 	NSString *server = [inDictionary objectForKey:@"server"];
+	NSString *originalSecret = [inDictionary objectForKey:@"originalsecret"];
+	NSString *originalFormat = [inDictionary objectForKey:@"originalformat"];
 	
 	NSMutableString *URLString = [NSMutableString stringWithString:@"http://"];
 	if ([farm length]) {
@@ -144,16 +146,26 @@ typedef unsigned int NSUInteger;
 	NSAssert([photoID length], @"Must have id attribute");
 	NSAssert([secret length], @"Must have secret attribute");
 	[URLString appendString:[photoSource substringFromIndex:7]];
-	[URLString appendFormat:@"%@/%@_%@", server, photoID, secret];
 	
-	if ([inSizeModifier length]) {
+	if ([inSizeModifier isEqualTo:@"o"]) {
+		[URLString appendFormat:@"%@/%@_%@_o.%@", server, photoID, originalSecret, originalFormat];
+	} else if ([inSizeModifier length]) {
+		[URLString appendFormat:@"%@/%@_%@", server, photoID, secret];
 		[URLString appendFormat:@"_%@.jpg", inSizeModifier];
-	}
-	else {
+	} else {
+		[URLString appendFormat:@"%@/%@_%@", server, photoID, secret];
 		[URLString appendString:@".jpg"];
 	}
 	
 	return [NSURL URLWithString:URLString];
+}
+
+- (NSURL *)photoLargestSourceURLFromDictionary:(NSDictionary *)inDictionary {
+  if ([inDictionary objectForKey:@"originalsecret"] == nil) {
+    return [self photoSourceURLFromDictionary:inDictionary size:@"b"];
+  } else {
+    return [self photoSourceURLFromDictionary:inDictionary size:@"o"];
+  }
 }
 
 - (NSURL *)photoWebPageURLFromDictionary:(NSDictionary *)inDictionary
